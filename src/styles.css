@@ -1,1 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    text-align: center;
+    font-family: sans-serif;
+}
+ul li {
+    padding: 20px;
+    display: inline-block;
+}
+
+.app-avatar {
+    width: 200px;
+}
+
+.onchange {
+    position: fixed;
+    bottom: 0;
+    background: rgb(155, 221, 190);
+    padding: 20px;
+
+}

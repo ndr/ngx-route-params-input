@@ -17,7 +17,13 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ngx-route-params-input": [
+        "dist/ngx-route-params-input/ngx-route-params-input",
+        "dist/ngx-route-params-input"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

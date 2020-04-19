@@ -119,6 +119,46 @@
           }
         }
       }
+    },
+    "ngx-route-params-input": {
+      "projectType": "library",
+      "root": "projects/ngx-route-params-input",
+      "sourceRoot": "projects/ngx-route-params-input/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-route-params-input/tsconfig.lib.json",
+            "project": "projects/ngx-route-params-input/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-route-params-input/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-route-params-input/src/test.ts",
+            "tsConfig": "projects/ngx-route-params-input/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-route-params-input/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-route-params-input/tsconfig.lib.json",
+              "projects/ngx-route-params-input/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }},
   "defaultProject": "route-params-input"
 }
