@@ -50,7 +50,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
     this.querySubscription = this.route.queryParams.subscribe(el => {
       this.content = el.content;
-    })
+    });
   }
 
   ngOnDestroy(): void {
@@ -165,4 +165,4 @@ userIdInput: string;
 @Input()
 content: string
 ```
-If there query and route params refers to the same input param, the route param will be passed and the route param will be ignored
+If there query and route params refers to the same input param, the route param will be passed and the query param will be ignored
