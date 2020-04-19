@@ -166,3 +166,7 @@ userIdInput: string;
 content: string
 ```
 If there query and route params refers to the same input param, the route param will be passed and the query param will be ignored
+
+## Example (Demo):
+
+https://stackblitz.com/edit/angular-v8hdug?embed=1&file=src/app/user/user-routing.module.ts
