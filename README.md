@@ -157,7 +157,7 @@ const routes: Routes = [{
   }
 }];
 ```
-will pass **"userId"** route param and **content** query param as
+will pass **"userId"** route param and **"content"** query param as
 ```typescript
 @Input()
 userIdInput: string;

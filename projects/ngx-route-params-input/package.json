@@ -1,6 +1,20 @@
 {
   "name": "ngx-route-params-input",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "author": "Andrii Cherepovskyi",
+  "description": "Anfular library which allows to pass route params as component @Input() props",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ndr/ngx-route-params-input.git"
+  },
+  "keywords": [
+    "angular",
+    "component",
+    "router",
+    "query-params",
+    "router-params"
+  ],
+  "license": "MIT",
   "peerDependencies": {
     "@angular/common": "^9.0.0",
     "@angular/core": "^9.0.0",
