@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { getAllRouteParams, getAllQueryParams } from './get-all-route-params';
 import { filter } from 'rxjs/operators';
 
-
 export interface IRouteParamsComponentData {
     component: any;
     routeParams?: any;

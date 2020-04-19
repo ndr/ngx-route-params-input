@@ -1,27 +1,168 @@
-# RouteParamsInput
+# NgxRouteParamsInput
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.1.
+**NgxRouteParamsInput** allows to use angular router params and query params as component @Input() without need to subscribe to router events in each component, e.g.
 
-## Development server
+Works only with Angular Ivy (angular 9 by default)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Without NgxRouteParamsInput:
 
-## Code scaffolding
+```typescript
+// routing module
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { UserComponent } from './components/user/user.component';
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+const routes: Routes = [{
+  path: ':userId',
+  component: UserComponent
+}];
 
-## Build
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class UserRoutingModule { }
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```typescript
+// component
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 
-## Running unit tests
+@Component({
+  selector: 'app-user',
+  templateUrl: './user.component.html'
+})
+export class UserComponent implements OnInit, OnDestroy {
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+  public userId: string;
+  public content: string
 
-## Running end-to-end tests
+  private paramSubscription: Subscription;
+  private querySubscription: Subscription;
+    
+  constructor(private route: ActivatedRoute) {}
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+  ngOnInit(): void {
+    this.paramSubscription = this.route.params.subscribe(el => {
+      this.userId = el.userId;
+    });
 
-## Further help
+    this.querySubscription = this.route.queryParams.subscribe(el => {
+      this.content = el.content;
+    })
+  }
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+  ngOnDestroy(): void {
+      this.paramSubscription.unsubscribe();
+      this.querySubscription.unsubscribe();
+  }
+}
+```
+
+## With NgxRouteParamsInput:
+
+1. Import NgxRouteParamsInputModule to your module
+
+```typescript
+import { NgModule } from '@angular/core';
+import { UserRoutingModule } from './user-routing.module';
+import { NgxRouteParamsInputModule } from 'ngx-route-params-input';
+
+@NgModule({
+  ...,
+  imports: [
+    ...
+    NgxLetterImageAvatarModule,
+  ]
+})
+export class UserModule { }
+```
+1. In routing module, change the component you want to get router params as @Inputs()
+to **NgxRouteParamsInputComponent** and pass component and data you want to transfer as route data config:
+```typescript
+// routing module
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { NgxRouteParamsInputComponent } from 'ngx-route-params-input';
+import { UserComponent } from './components/user/user.component';
+
+const routes: Routes = [{
+  path: ':userId',
+  component: NgxRouteParamsInputComponent,
+  data: {
+    component: UserComponent,
+    routeParams: {
+      userId: 'userIdInput'
+    },
+    queryParams: {
+      content: 'content'
+    }
+  }
+}];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class UserRoutingModule { }
+```
+```typescript
+// component code:
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-user',
+  templateUrl: './user.component.html'
+})
+export class UserComponent {
+
+  @Input()
+  public userIdInput: string;
+
+  @Input()
+  public content: string;
+
+}
+```
+
+## Documentation:
+
+Route data field structure:
+```typescript
+export interface IRouteParamsComponentData {
+    component: any; // component you want to render and pass props to
+    routeParams?: any; // route params you want to pass
+    queryParams?: any; // query params you want to pass
+    [key: string]: any; // any other data you are using in your app
+}
+```
+**routeParams** and **queryParams** has the following schema:
+{
+    [paramName: string]: [inputName: string]
+},
+e.g. the following code:
+```typescript
+const routes: Routes = [{
+  path: ':userId',
+  component: NgxRouteParamsInputComponent,
+  data: {
+    component: UserComponent,
+    routeParams: {
+      userId: 'userIdInput'
+    },
+    queryParams: {
+      content: 'content'
+    }
+  }
+}];
+```
+will pass **"userId"** route param and **content** query param as
+```typescript
+@Input()
+userIdInput: string;
+
+@Input()
+content: string
+```
+If there query and route params refers to the same input param, the route param will be passed and the route param will be ignored
