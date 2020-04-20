@@ -12,7 +12,7 @@ const routes: Routes = [{
       userId: 'userIdInput'
     },
     queryParams: {
-      content: 'content'
+      section: 'section'
     }
   }
 }];

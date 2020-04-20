@@ -17,11 +17,11 @@ export class UserComponent implements OnChanges {
   @Input()
   public userIdInput: string;
 
-  @Input()
+  @Input('section')
   public content: string;
 
   ngOnChanges(changes): void {
+    console.log('component changes', changes);
     this.lastChange = changes;
   }
-
 }

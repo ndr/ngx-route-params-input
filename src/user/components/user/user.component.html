@@ -4,8 +4,8 @@
     <img class="app-avatar" [ngxLetterImageAvatar]="user.name" />
     <p>Date of birth: {{ user.date_of_birth }}</p>
     <ul>
-        <li><a [routerLink]="['/user/', userIdInput]" [queryParams]="{ content: 'description' }">Description</a></li>
-        <li><a [routerLink]="['/user/', userIdInput]" [queryParams]="{ content: 'actor' }">Actor/Actress</a></li>
+        <li><a [routerLink]="['/user/', userIdInput]" [queryParams]="{ section: 'description' }">Description</a></li>
+        <li><a [routerLink]="['/user/', userIdInput]" [queryParams]="{ section: 'actor' }">Actor/Actress</a></li>
     </ul>
     <section *ngIf="content">
         <p>{{ user[content] }}</p>
