@@ -1,7 +1,8 @@
 
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, SimpleChanges, SimpleChange, OnDestroy, AfterViewInit, ComponentRef } from '@angular/core';
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, SimpleChange } from '@angular/core';
+import type { SimpleChanges, OnDestroy, AfterViewInit, ComponentRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
 import { getAllRouteParams, getAllQueryParams } from './get-all-route-params';
 import { filter } from 'rxjs/operators';
 import { isDevMode } from '@angular/core';
@@ -17,11 +18,17 @@ export interface IRouteParamsComponentData {
     [key: string]: any;
 }
 
+type ComponentPropName = string;
+
+export interface IInputMap {
+    [routeParamName: string]: ComponentPropName;
+}
+
 @Component({
     selector: 'ngx-route-params-input',
     template: '<template #routeParamsContainer></template>'
 })
-export class NgxRouteParamsInputComponent<T> implements AfterViewInit, OnDestroy {
+export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
 
     @ViewChild('routeParamsContainer', { read: ViewContainerRef }) 
     public container;
@@ -29,7 +36,7 @@ export class NgxRouteParamsInputComponent<T> implements AfterViewInit, OnDestroy
     public readonly routeParamsDataKey = 'routeParams';
     public readonly queryParamsDataKey = 'queryParams';
 
-    private inputParams: any;
+    private propParams: any;
     public componentConstructor: any;
 
     public componentRef: ComponentRef<any>;
@@ -39,6 +46,22 @@ export class NgxRouteParamsInputComponent<T> implements AfterViewInit, OnDestroy
 
     public dataSubscription: Subscription;
     public paramSubscription: Subscription;
+
+    private get inputMap(): IInputMap {
+        const map = {};
+        if (!this.componentConstructor) {
+            return map;
+        }
+        const componentPropDecorators = this.componentConstructor.propDecorators;
+        Object.keys(componentPropDecorators).forEach(key => {
+            if (componentPropDecorators[key][0] && componentPropDecorators[key][0]?.type?.prototype?.ngMetadataName === 'Input') {
+                const propName = key;
+                const inputName = (componentPropDecorators[key][0]?.args && componentPropDecorators[key][0]?.args[0]) || key;
+                map[inputName] = propName;
+            }
+        });
+        return map;
+    }
 
     constructor(private route: ActivatedRoute,
         private router: Router,
@@ -104,13 +127,30 @@ export class NgxRouteParamsInputComponent<T> implements AfterViewInit, OnDestroy
         };
     }
 
+
+    private mapInputParams(paramsFromRouter): any {
+        const propertyParams = {};
+        Object.keys(paramsFromRouter).forEach(routerKey => {
+            const property = this.inputMap[routerKey];
+            if (!property) {
+                if (isDevMode()) {
+                    window?.console?.error(`NgxRouteParamsInput: You are trying to pass "${routerKey}" as @Input() param, which is not exist at ${this.componentConstructor.name}.`);
+                }
+            } else {
+                propertyParams[property] = paramsFromRouter[routerKey];
+            }
+        });
+        return propertyParams;
+    }
+
     private handleParams(): void {
-        const oldInputParams = this.inputParams || {};
-        this.inputParams = this.getRouteParamsForInputPass();
+        const oldInputParams = this.propParams || {};
+        const paramsFromRouter = this.getRouteParamsForInputPass();
+        this.propParams = this.mapInputParams(paramsFromRouter);
 
         const removedParams = Object.keys(oldInputParams)
             .filter(oldParam => {
-                return Object.keys(this.inputParams).includes(oldParam);
+                return Object.keys(this.propParams).includes(oldParam);
             })
             .reduce((acc, paramName) => {
                 acc[paramName] = null;
@@ -121,24 +161,21 @@ export class NgxRouteParamsInputComponent<T> implements AfterViewInit, OnDestroy
 
         Object.keys({
             ...removedParams,
-            ...this.inputParams
+            ...this.propParams
         }).forEach(inputParam => {
             const firstChange = !this.isNotFirstChangeCollection[inputParam];
-            this.componentRef.instance[inputParam] = this.inputParams[inputParam];
-            console.log(this.componentRef, this.componentConstructor);
-            if (!(inputParam in this.componentRef.instance) && isDevMode()) {
-                console.warn(`NgxRouteParamsInput: "${inputParam}" do not exists in someclass`);
-            }
+            this.componentRef.instance[inputParam] = this.propParams[inputParam];
             this.isNotFirstChangeCollection[inputParam] = true;
-            if (oldInputParams[inputParam] !== this.inputParams[inputParam]) {
-              changes[inputParam] = new SimpleChange(oldInputParams[inputParam], this.inputParams[inputParam], firstChange);
+            if (oldInputParams[inputParam] !== this.propParams[inputParam]) {
+              changes[inputParam] = new SimpleChange(oldInputParams[inputParam] || undefined, this.propParams[inputParam], firstChange);
             }
         });
 
-        if (typeof this.componentRef.instance['ngOnChanges'] === 'function') {
+        if (typeof this.componentRef.instance['ngOnChanges'] === 'function' && Object.keys(changes).length) {
             this.componentRef.instance['ngOnChanges'](changes);
         }
 
         this.componentRef.changeDetectorRef.detectChanges();
     }
+
 }
