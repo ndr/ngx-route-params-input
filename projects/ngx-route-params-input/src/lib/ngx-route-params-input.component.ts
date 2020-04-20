@@ -4,11 +4,16 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { getAllRouteParams, getAllQueryParams } from './get-all-route-params';
 import { filter } from 'rxjs/operators';
+import { isDevMode } from '@angular/core';
 
 export interface IRouteParamsComponentData {
     component: any;
-    routeParams?: any;
-    queryParams?: any;
+    routeParams?: {
+        [param: string]: string;
+    },
+    queryParams?: {
+        [param: string]: string;
+    },
     [key: string]: any;
 }
 
@@ -16,7 +21,7 @@ export interface IRouteParamsComponentData {
     selector: 'ngx-route-params-input',
     template: '<template #routeParamsContainer></template>'
 })
-export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
+export class NgxRouteParamsInputComponent<T> implements AfterViewInit, OnDestroy {
 
     @ViewChild('routeParamsContainer', { read: ViewContainerRef }) 
     public container;
@@ -88,10 +93,10 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         const queryInputParams = {};
 
         Object.keys(passRouteParamsInstructions).forEach(key => {
-            routeInputParams[passRouteParamsInstructions[key]] = routeParams[key];
+            routeInputParams[passRouteParamsInstructions[key] as string] = routeParams[key];
         });
         Object.keys(passQueryParamsInstructions).forEach(key => {
-          queryInputParams[passQueryParamsInstructions[key]] = queryParams[key];
+          queryInputParams[passQueryParamsInstructions[key] as string] = queryParams[key];
         });
         return {
           ...queryInputParams,
@@ -120,6 +125,10 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         }).forEach(inputParam => {
             const firstChange = !this.isNotFirstChangeCollection[inputParam];
             this.componentRef.instance[inputParam] = this.inputParams[inputParam];
+            console.log(this.componentRef, this.componentConstructor);
+            if (!(inputParam in this.componentRef.instance) && isDevMode()) {
+                console.warn(`NgxRouteParamsInput: "${inputParam}" do not exists in someclass`);
+            }
             this.isNotFirstChangeCollection[inputParam] = true;
             if (oldInputParams[inputParam] !== this.inputParams[inputParam]) {
               changes[inputParam] = new SimpleChange(oldInputParams[inputParam], this.inputParams[inputParam], firstChange);
