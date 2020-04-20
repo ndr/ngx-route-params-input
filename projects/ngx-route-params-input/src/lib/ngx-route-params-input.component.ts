@@ -116,10 +116,10 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         const queryInputParams = {};
 
         Object.keys(passRouteParamsInstructions).forEach(key => {
-            routeInputParams[passRouteParamsInstructions[key] as string] = routeParams[key];
+            routeInputParams[passRouteParamsInstructions[key]] = routeParams[key];
         });
         Object.keys(passQueryParamsInstructions).forEach(key => {
-          queryInputParams[passQueryParamsInstructions[key] as string] = queryParams[key];
+          queryInputParams[passQueryParamsInstructions[key]] = queryParams[key];
         });
         return {
           ...queryInputParams,
