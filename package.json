@@ -1,13 +1,15 @@
 {
   "name": "route-params-input",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "build:lib": "ng build ngx-route-params-input",
+    "moveToLib": "node tools/copy-readme"
   },
   "author": "Andrii Cherepovskyi",
   "description": "Angular library which allows to pass route params as component @Input() props",
