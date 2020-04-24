@@ -7,12 +7,14 @@ const routes: Routes = [{
   path: ':userId',
   component: NgxRouteParamsInputComponent,
   data: {
-    component: UserComponent,
-    routeParams: {
-      userId: 'userIdInput'
-    },
-    queryParams: {
-      section: 'section'
+    ngxRouteParamsInput: {
+      component: UserComponent,
+      routeParams: {
+        userId: 'userIdInput'
+      },
+      queryParams: {
+        section: 'section'
+      }
     }
   }
 }];

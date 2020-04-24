@@ -1,11 +1,11 @@
 
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, SimpleChange } from '@angular/core';
-import type { SimpleChanges, OnDestroy, AfterViewInit, ComponentRef } from '@angular/core';
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, SimpleChange, SimpleChanges, OnDestroy, AfterViewInit, ComponentRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import type { Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { getAllRouteParams, getAllQueryParams } from './get-all-route-params';
 import { filter } from 'rxjs/operators';
 import { isDevMode } from '@angular/core';
+import { getInputMap } from './get-input-map';
 
 export interface IRouteParamsComponentData {
     component: any;
@@ -18,17 +18,14 @@ export interface IRouteParamsComponentData {
     [key: string]: any;
 }
 
-type ComponentPropName = string;
-
-export interface IInputMap {
-    [routeParamName: string]: ComponentPropName;
-}
 
 @Component({
     selector: 'ngx-route-params-input',
     template: '<template #routeParamsContainer></template>'
 })
 export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
+
+    public readonly libDataKey = 'ngxRouteParamsInput';
 
     @ViewChild('routeParamsContainer', { read: ViewContainerRef }) 
     public container;
@@ -47,21 +44,6 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
     public dataSubscription: Subscription;
     public paramSubscription: Subscription;
 
-    private get inputMap(): IInputMap {
-        const map = {};
-        if (!this.componentConstructor) {
-            return map;
-        }
-        const componentPropDecorators = this.componentConstructor.propDecorators;
-        Object.keys(componentPropDecorators).forEach(key => {
-            if (componentPropDecorators[key][0] && componentPropDecorators[key][0]?.type?.prototype?.ngMetadataName === 'Input') {
-                const propName = key;
-                const inputName = (componentPropDecorators[key][0]?.args && componentPropDecorators[key][0]?.args[0]) || key;
-                map[inputName] = propName;
-            }
-        });
-        return map;
-    }
 
     constructor(private route: ActivatedRoute,
         private router: Router,
@@ -81,8 +63,9 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
     }
 
     private subscribeToDataChange(): void {
-        this.dataSubscription = this.route.data.subscribe((data: IRouteParamsComponentData) => {
-            this.handleData(data);
+        this.dataSubscription = this.route.data.subscribe((data: any) => {
+            const routeInputData = data && data[this.libDataKey] || {};
+            this.handleData(routeInputData);
             this.handleParams();
         });
         this.paramSubscription = this.router.events.pipe(
@@ -96,6 +79,9 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         if (this.componentConstructor !== data.component) {
             this.componentConstructor = data.component;
             this.container.clear();
+            if (!this.componentConstructor) {
+                return;
+            }
             const factory = this.resolver.resolveComponentFactory(this.componentConstructor);
             this.componentRef = this.container.createComponent(factory);
             this.isNotFirstChangeCollection = {};
@@ -127,11 +113,11 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         };
     }
 
-
     private mapInputParams(paramsFromRouter): any {
         const propertyParams = {};
+        const inputMap = getInputMap(this.componentConstructor);
         Object.keys(paramsFromRouter).forEach(routerKey => {
-            const property = this.inputMap[routerKey];
+            const property = inputMap[routerKey];
             if (!property) {
                 if (isDevMode()) {
                     window?.console?.error(`NgxRouteParamsInput: You are trying to pass "${routerKey}" as @Input() param, which is not exist at ${this.componentConstructor.name}.`);
@@ -144,6 +130,9 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
     }
 
     private handleParams(): void {
+        if (!this.componentConstructor) {
+            return;
+        }
         const oldInputParams = this.propParams || {};
         const paramsFromRouter = this.getRouteParamsForInputPass();
         this.propParams = this.mapInputParams(paramsFromRouter);
@@ -167,11 +156,11 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
             this.componentRef.instance[inputParam] = this.propParams[inputParam];
             this.isNotFirstChangeCollection[inputParam] = true;
             if (oldInputParams[inputParam] !== this.propParams[inputParam]) {
-              changes[inputParam] = new SimpleChange(oldInputParams[inputParam] || undefined, this.propParams[inputParam], firstChange);
+              changes[inputParam] = new SimpleChange(oldInputParams[inputParam], this.propParams[inputParam], firstChange);
             }
         });
 
-        if (typeof this.componentRef.instance['ngOnChanges'] === 'function' && Object.keys(changes).length) {
+        if (typeof this.componentRef?.instance['ngOnChanges'] === 'function' && Object.keys(changes).length) {
             this.componentRef.instance['ngOnChanges'](changes);
         }
 

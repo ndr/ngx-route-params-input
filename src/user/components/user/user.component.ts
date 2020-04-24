@@ -21,7 +21,6 @@ export class UserComponent implements OnChanges {
   public content: string;
 
   ngOnChanges(changes): void {
-    console.log('component changes', changes);
     this.lastChange = changes;
   }
 }
