@@ -1,8 +1,12 @@
-export interface IInputMap {
-    [routeParamName: string]: string;
-}
-
 const JIT_PROP_DECORATORS_KEY = '__prop__metadata__';
+
+const addPropName = (map: any, inputName: string, propName: string) => {
+    if (!map[inputName]) {
+      map[inputName] = [];
+    }
+    map[inputName].push(propName);
+    return map;
+  }
 
 const getInputMapAot = (componentConstructor: any) => {
     const map = {};
@@ -12,11 +16,10 @@ const getInputMapAot = (componentConstructor: any) => {
         if (componentPropDecorators[key][0] && componentPropDecorators[key][0]?.type?.prototype?.ngMetadataName === 'Input') {
             const propName = key;
             const inputName = (componentPropDecorators[key][0]?.args && componentPropDecorators[key][0]?.args[0]) || key;
-            map[inputName] = propName;
+            addPropName(map, inputName, propName);
         }
     });
     return map;
-
 }
 
 const getInputMapJit = (componentConstructor: any) => {
@@ -27,7 +30,7 @@ const getInputMapJit = (componentConstructor: any) => {
         if (propMetadata[key][0] && propMetadata[key][0]?.__proto__?.ngMetadataName === 'Input') {
             const propName = key;
             const inputName = (propMetadata[key][0] && propMetadata[key][0].bindingPropertyName) || key;
-            map[inputName] = propName;
+            addPropName(map, inputName, propName);
         }
     });
 
