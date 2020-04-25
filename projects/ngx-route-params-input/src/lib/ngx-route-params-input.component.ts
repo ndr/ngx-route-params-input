@@ -7,11 +7,6 @@ import { filter } from 'rxjs/operators';
 import { isDevMode } from '@angular/core';
 import { getInputMap } from './get-input-map';
 
-export interface IInputMap {
-    [routeParamName: string]: string;
-}
-
-
 export interface IRouteParamsComponentData {
     component: any;
     routeParams?: {
