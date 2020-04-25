@@ -7,6 +7,11 @@ import { filter } from 'rxjs/operators';
 import { isDevMode } from '@angular/core';
 import { getInputMap } from './get-input-map';
 
+export interface IInputMap {
+    [routeParamName: string]: string;
+}
+
+
 export interface IRouteParamsComponentData {
     component: any;
     routeParams?: {
@@ -117,13 +122,15 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         const propertyParams = {};
         const inputMap = getInputMap(this.componentConstructor);
         Object.keys(paramsFromRouter).forEach(routerKey => {
-            const property = inputMap[routerKey];
-            if (!property) {
+            const properties = inputMap[routerKey];
+            if (!properties) {
                 if (isDevMode()) {
                     window?.console?.error(`NgxRouteParamsInput: You are trying to pass "${routerKey}" as @Input() param, which is not exist at ${this.componentConstructor.name}.`);
                 }
-            } else {
-                propertyParams[property] = paramsFromRouter[routerKey];
+            } {
+                properties.forEach(property => {
+                    propertyParams[property] = paramsFromRouter[routerKey];
+                });
             }
         });
         return propertyParams;
