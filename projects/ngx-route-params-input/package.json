@@ -1,6 +1,6 @@
 {
   "name": "ngx-route-params-input",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Andrii Cherepovskyi",
   "description": "Angular library which allows to pass route params as component @Input() props",
   "repository": {
