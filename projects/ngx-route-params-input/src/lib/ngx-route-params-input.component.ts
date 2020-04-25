@@ -139,7 +139,7 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
 
         const removedParams = Object.keys(oldInputParams)
             .filter(oldParam => {
-                return Object.keys(this.propParams).includes(oldParam);
+                return !Object.keys(this.propParams).includes(oldParam);
             })
             .reduce((acc, paramName) => {
                 acc[paramName] = null;
