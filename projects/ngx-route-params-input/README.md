@@ -6,7 +6,16 @@ Works with Angular 9 (and some of latest 8.X.X versions, older - not guaranteed)
 
 ## Instruction:
 
-1. Import NgxRouteParamsInputModule to your module
+1. Install lib:
+```bash
+npm install --save ngx-route-params-input
+```
+or via yarn:
+```bash
+yarn add ngx-route-params-input
+```
+
+2. Import NgxRouteParamsInputModule to your module
 
 ```typescript
 import { NgModule } from '@angular/core';
@@ -22,7 +31,7 @@ import { NgxRouteParamsInputModule } from 'ngx-route-params-input';
 })
 export class UserModule { }
 ```
-1. In routing module, change the component you want to get router params as @Inputs()
+3. In routing module, change the component you want to get router params as @Inputs()
 to **NgxRouteParamsInputComponent** and pass component and data you want to transfer as route data config's special parameter **ngxRouteParamsInput**:
 ```typescript
 // routing module
