@@ -17,7 +17,7 @@ import { NgxRouteParamsInputModule } from 'ngx-route-params-input';
   ...,
   imports: [
     ...
-    NgxLetterImageAvatarModule,
+    NgxRouteParamsInputModule,
   ]
 })
 export class UserModule { }
