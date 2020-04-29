@@ -118,7 +118,8 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
         const inputMap = getInputMap(this.componentConstructor);
         Object.keys(paramsFromRouter).forEach(routerKey => {
             const properties = inputMap[routerKey];
-            if (!properties) {
+            const isPropertiesEmpty = Object.keys(properties).length === 0 && properties.constructor === Object;
+            if (!isPropertiesEmpty) {
                 if (isDevMode()) {
                     window?.console?.error(`NgxRouteParamsInput: You are trying to pass "${routerKey}" as @Input() param, which is not exist at ${this.componentConstructor.name}.`);
                 }
