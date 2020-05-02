@@ -37,6 +37,19 @@ const getInputMapJit = (componentConstructor: any) => {
     return map;
 }
 
+const getInputMapOptimized = (componentConstructor: any) => {
+    const map = {};
+    const declaredInputs = (componentConstructor['ɵcmp']?.declaredInputs || componentConstructor['ɵcmp']?.inputs);
+
+    Object.keys(declaredInputs).forEach(key => {
+        const inputName = key;
+        const propName = declaredInputs[key];
+        addPropName(map, inputName, propName);
+    });
+
+    return map;
+}
+
 export const getInputMap = (componentConstructor: any) => {
     if (!componentConstructor) {
         return {};
@@ -45,6 +58,8 @@ export const getInputMap = (componentConstructor: any) => {
         return getInputMapAot(componentConstructor);
     } else if (componentConstructor[JIT_PROP_DECORATORS_KEY]) {
         return getInputMapJit(componentConstructor);
+    } else if (componentConstructor['ɵcmp']?.declaredInputs || componentConstructor['ɵcmp']?.inputs) {
+        return getInputMapOptimized(componentConstructor);
     }
 
     return {};
