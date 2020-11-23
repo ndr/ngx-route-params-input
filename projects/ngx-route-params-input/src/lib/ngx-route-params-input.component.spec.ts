@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { NgxRouteParamsInputComponent } from './ngx-route-params-input.component';
 
@@ -6,7 +6,7 @@ describe('NgxRouteParamsInputComponent', () => {
   let component: NgxRouteParamsInputComponent;
   let fixture: ComponentFixture<NgxRouteParamsInputComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ NgxRouteParamsInputComponent ]
     })
