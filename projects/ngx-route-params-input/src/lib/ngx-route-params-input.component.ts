@@ -1,5 +1,5 @@
 
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, SimpleChange, SimpleChanges, OnDestroy, AfterViewInit, ComponentRef } from '@angular/core';
+import { Component, ViewChild, ViewContainerRef, SimpleChange, SimpleChanges, OnDestroy, AfterViewInit, ComponentRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { getAllRouteParams, getAllQueryParams } from './get-all-route-params';
@@ -46,8 +46,7 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
 
 
     constructor(private route: ActivatedRoute,
-        private router: Router,
-        private resolver: ComponentFactoryResolver) {}
+        private router: Router) {}
 
     ngAfterViewInit(): void {
         this.subscribeToDataChange();
@@ -82,8 +81,7 @@ export class NgxRouteParamsInputComponent implements AfterViewInit, OnDestroy {
             if (!this.componentConstructor) {
                 return;
             }
-            const factory = this.resolver.resolveComponentFactory(this.componentConstructor);
-            this.componentRef = this.container.createComponent(factory);
+            this.componentRef = this.container.createComponent(this.componentConstructor);
             this.isNotFirstChangeCollection = {};
         }
 

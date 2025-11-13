@@ -54,12 +54,23 @@ export const getInputMap = (componentConstructor: any) => {
     if (!componentConstructor) {
         return {};
     }
+
+    // Try different metadata extraction methods based on Angular version and compilation mode
+    // These methods support Angular 9-19 with both AOT and JIT compilation
+
+    // Ivy optimized mode (Angular 9+ with Ivy enabled) - most common in modern Angular
+    if (componentConstructor['ɵcmp']?.declaredInputs || componentConstructor['ɵcmp']?.inputs) {
+        return getInputMapOptimized(componentConstructor);
+    }
+
+    // AOT compilation mode (older Angular versions)
     if (componentConstructor.propDecorators) {
         return getInputMapAot(componentConstructor);
-    } else if (componentConstructor[JIT_PROP_DECORATORS_KEY]) {
+    }
+
+    // JIT compilation mode (development/runtime metadata)
+    if (componentConstructor[JIT_PROP_DECORATORS_KEY]) {
         return getInputMapJit(componentConstructor);
-    } else if (componentConstructor['ɵcmp']?.declaredInputs || componentConstructor['ɵcmp']?.inputs) {
-        return getInputMapOptimized(componentConstructor);
     }
 
     return {};
